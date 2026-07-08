@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#667eea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>" type="image/svg+xml">
 <title>智学伴 StudyFlow - AI智能学习伙伴</title>
 <style>
 /* ================ 全局基础样式 ================ */
@@ -307,11 +312,51 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Ping
 .camera-hint { font-size: 12px; line-height: 1.7; opacity: 0.85; margin-top: 8px; }
 
 /* 学习报告 */
-.report-section { margin-bottom: 16px; }
-.report-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
+.report-page { padding: 20px; }
+.report-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #a855f7 100%); border-radius: 24px; padding: 24px; color: #fff; margin-bottom: 20px; position: relative; overflow: hidden; }
+.report-header::before { content: ''; position: absolute; top: -80px; right: -60px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+.report-header::after { content: ''; position: absolute; bottom: -60px; left: -40px; width: 140px; height: 140px; background: rgba(255,255,255,0.06); border-radius: 50%; }
+.report-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; position: relative; z-index: 1; }
+.report-date { font-size: 12px; opacity: 0.85; position: relative; z-index: 1; }
+.report-summary { display: flex; justify-content: space-around; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15); position: relative; z-index: 1; }
+.report-summary-item { text-align: center; }
+.report-summary-item .num { font-size: 24px; font-weight: 800; }
+.report-summary-item .label { font-size: 11px; opacity: 0.85; margin-top: 4px; }
+
+.report-section { background: #fff; border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+.report-section-title { font-size: 14px; font-weight: 700; color: #1f2937; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+.report-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
 .report-row:last-child { border-bottom: none; }
-.report-row .k { color: #666; }
-.report-row .v { color: #222; font-weight: 600; }
+.report-row .k { color: #64748b; }
+.report-row .v { color: #1f2937; font-weight: 600; }
+
+/* 柱状图 */
+.bar-chart-wrap { display: flex; align-items: flex-end; justify-content: space-between; height: 120px; padding: 0 4px; }
+.bar-chart-bar { width: 11%; border-radius: 6px 6px 0 0; position: relative; transition: height 0.5s ease; min-height: 4px; }
+.bar-chart-bar::after { content: attr(data-value); position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #64748b; white-space: nowrap; }
+.bar-chart-labels { display: flex; justify-content: space-between; margin-top: 10px; font-size: 10px; color: #94a3b8; }
+
+/* 环形图 */
+.ring-chart-wrap { display: flex; align-items: center; gap: 16px; }
+.ring-chart { width: 100px; height: 100px; border-radius: 50%; position: relative; }
+.ring-chart-inner { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.ring-chart-inner .pct { font-size: 22px; font-weight: 800; color: #667eea; }
+.ring-chart-inner .label { font-size: 10px; color: #94a3b8; text-align: center; }
+.ring-legend { flex: 1; }
+.ring-legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+.ring-legend-item:last-child { margin-bottom: 0; }
+.ring-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+/* 学习建议卡片 */
+.report-tips { background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 16px; padding: 16px; margin-top: 16px; }
+.report-tips-title { font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 10px; }
+.report-tips-list { font-size: 12px; color: #b45309; line-height: 1.8; }
+.report-tips-list li { margin-bottom: 6px; }
+.report-tips-list li:last-child { margin-bottom: 0; }
+
+.report-back-btn { width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; padding: 14px; border-radius: 16px; font-size: 15px; font-weight: 700; margin-top: 16px; cursor: pointer; transition: all 0.2s; }
+.report-back-btn:active { transform: scale(0.98); }
 
 /* 颜色辅助 */
 .bg-purple { background: linear-gradient(135deg, #667eea, #764ba2); }
@@ -1341,6 +1386,7 @@ function toggleFocus() {
           }
         } else {
           toast('🎉 恭喜种下第 ' + data.treesPlanted + ' 棵树！');
+          showNotification('🎉 专注完成', `太棒了！你已专注 ${mins} 分钟，种下了第 ${data.treesPlanted} 棵树！`);
           focusRemaining = focusDuration;
           renderFocus();
           renderHome();
@@ -2005,50 +2051,103 @@ function showReport() {
   const total = data.wrongQuestions.length;
   const doneTasks = data.tasks.filter(t => t.done).length;
   const masteredPct = total > 0 ? Math.round((mastered / total) * 100) : 0;
-  const weekMins = (() => {
-    let total = 0;
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(); d.setDate(d.getDate() - i);
-      const ds = d.toISOString().split('T')[0];
-      total += data.plantHistory ? data.plantHistory.filter(p => p.date === ds).reduce((s, p) => s + p.mins, 0) : 0;
-    }
-    return total;
-  })();
   const lvInfo = getLevelInfo(data.level);
-
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">学习报告</div>
-      <div class="modal-close" onclick="closeModal()">✕</div>
-    </div>
-    <div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:20px;border-radius:14px;margin-bottom:14px;text-align:center;">
-      <div style="font-size:12px;opacity:0.9;">📊 综合学习数据</div>
-      <div style="font-size:28px;font-weight:700;margin-top:8px;">Lv.${data.level} ${lvInfo.icon} ${lvInfo.name}</div>
-      <div style="font-size:12px;opacity:0.85;margin-top:4px;">${data.totalXp} 总经验 · ${data.achievements.length} 个成就</div>
-    </div>
-
-    <div class="report-section">
-      <div class="report-row"><span>本周学习</span><span>${weekMins} 分钟</span></div>
-      <div class="report-row"><span>累计专注</span><span>${data.focusMinutes} 分钟</span></div>
-      <div class="report-row"><span>番茄钟</span><span>${data.pomodoros} 个</span></div>
-      <div class="report-row"><span>种树数</span><span>🌲 ${data.treesPlanted} 棵</span></div>
-      <div class="report-row"><span>任务完成</span><span>${doneTasks}/${data.tasks.length} 个</span></div>
-      <div class="report-row"><span>错题掌握率</span><span>${mastered}/${total} (${masteredPct}%)</span></div>
-      <div class="report-row"><span>连续打卡</span><span>🔥 ${data.streak} 天</span></div>
-    </div>
-
-    <div class="report-section" style="margin-top:16px;">
-      <div style="font-size:13px;font-weight:600;color:#222;margin-bottom:8px;">💡 学习建议</div>
-      <div style="font-size:12px;color:#666;line-height:1.8;padding:10px;background:#f8f9fa;border-radius:10px;">
-        ${total - mastered > 2 ? '📚 错题较多，建议每天复习 2-3 道错题<br>' : ''}
-        ${data.tasks.filter(t=>!t.done).length > 0 ? '✅ 今日任务尚未完成，加油！<br>' : ''}
-        ${data.focusMinutes < 60 ? '⏰ 本周专注时间较少，建议每天保持 30-60 分钟的学习<br>' : ''}
-        🌿 建议开启番茄循环模式，提高学习效率<br>
-        🏆 坚持打卡可获得大量经验和成就奖励！
+  
+  const weekData = [];
+  const weekLabels = [];
+  let weekMins = 0;
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const mins = data.plantHistory ? data.plantHistory.filter(p => p.date === ds).reduce((s, p) => s + p.mins, 0) : 0;
+    weekData.push(mins);
+    weekLabels.push(['日','一','二','三','四','五','六'][d.getDay()]);
+    weekMins += mins;
+  }
+  const maxMins = Math.max(...weekData, 1);
+  
+  const subjects = {};
+  data.tasks.forEach(t => {
+    const s = t.subject || '其他';
+    subjects[s] = (subjects[s] || 0) + (t.done ? 1 : 0);
+  });
+  
+  const taskTotal = data.tasks.length;
+  const donePct = taskTotal > 0 ? Math.round((doneTasks / taskTotal) * 100) : 0;
+  
+  const tips = [];
+  if (total - mastered > 2) tips.push('📚 错题较多，建议每天复习 2-3 道错题');
+  if (data.tasks.filter(t=>!t.done).length > 0) tips.push('✅ 今日任务尚未完成，加油！');
+  if (weekMins < 60) tips.push('⏰ 本周专注时间较少，建议每天保持 30-60 分钟');
+  if (data.streak < 3) tips.push('🔥 坚持连续打卡，养成好习惯！');
+  if (tips.length === 0) tips.push('🎉 学习状态很棒，继续保持！');
+  
+  $('app-content').innerHTML = `
+    <div class="report-page">
+      <div class="report-header">
+        <div class="report-title">📊 学习报告</div>
+        <div class="report-date">${new Date().toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric',weekday:'long'})}</div>
+        <div class="report-summary">
+          <div class="report-summary-item"><div class="num">${data.level}</div><div class="label">等级</div></div>
+          <div class="report-summary-item"><div class="num">${weekMins}</div><div class="label">本周分钟</div></div>
+          <div class="report-summary-item"><div class="num">${data.streak}</div><div class="label">连续打卡</div></div>
+          <div class="report-summary-item"><div class="num">${data.treesPlanted}</div><div class="label">种树</div></div>
+        </div>
       </div>
+
+      <div class="report-section">
+        <div class="report-section-title">📈 本周学习趋势</div>
+        <div class="bar-chart-wrap">
+          ${weekData.map((m, i) => `
+            <div class="bar-chart-bar" style="height:${(m/maxMins)*100}%;background:linear-gradient(180deg,#667eea,#8b5cf6);" data-value="${m}m"></div>
+          `).join('')}
+        </div>
+        <div class="bar-chart-labels">${weekLabels.map(l => `<span>${l}</span>`).join('')}</div>
+      </div>
+
+      <div class="report-section">
+        <div class="report-section-title">🎯 任务完成情况</div>
+        <div class="ring-chart-wrap">
+          <div class="ring-chart" style="background:conic-gradient(#667eea ${donePct}%, #e2e8f0 ${donePct}%);">
+            <div class="ring-chart-inner">
+              <div><div class="pct">${donePct}%</div><div class="label">完成率</div></div>
+            </div>
+          </div>
+          <div class="ring-legend">
+            <div class="ring-legend-item"><div class="ring-dot" style="background:#667eea;"></div><span>已完成 ${doneTasks} 个</span></div>
+            <div class="ring-legend-item"><div class="ring-dot" style="background:#e2e8f0;"></div><span>待完成 ${taskTotal-doneTasks} 个</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-section">
+        <div class="report-section-title">📚 学科分布</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          ${Object.entries(subjects).map(([name, count]) => {
+            const colors = {'数学':'#f59e0b','英语':'#3b82f6','物理':'#10b981','语文':'#ec4899','其他':'#6b7280'};
+            return `<div style="background:${colors[name]||'#667eea'};color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;">${name} ${count}个</div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <div class="report-section">
+        <div class="report-section-title">📋 详细数据</div>
+        <div class="report-row"><span class="k">累计专注</span><span class="v">${data.focusMinutes} 分钟</span></div>
+        <div class="report-row"><span class="k">番茄钟</span><span class="v">${data.pomodoros} 个</span></div>
+        <div class="report-row"><span class="k">错题总数</span><span class="v">${total} 道</span></div>
+        <div class="report-row"><span class="k">错题掌握</span><span class="v">${mastered} 道 (${masteredPct}%)</span></div>
+        <div class="report-row"><span class="k">总经验</span><span class="v">${data.totalXp} XP</span></div>
+        <div class="report-row"><span class="k">成就解锁</span><span class="v">${data.achievements.length} / ${ACHIEVEMENTS.length} 个</span></div>
+      </div>
+
+      <div class="report-tips">
+        <div class="report-tips-title">💡 学习建议</div>
+        <div class="report-tips-list">${tips.map(t => `<li>${t}</li>`).join('')}</div>
+      </div>
+
+      <button class="report-back-btn" onclick="renderProfile()">返回个人中心</button>
     </div>
-    <button class="btn-full" onclick="closeModal()" style="margin-top:16px;">我知道了</button>
-  `);
+  `;
 }
 
 // --- 设置 ---
@@ -2137,6 +2236,45 @@ function updateClock() {
 setInterval(updateClock, 30000);
 updateClock();
 updateHeader();
+
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    Notification.requestPermission();
+  }
+}
+
+function showNotification(title, body, icon = '📚') {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">' + icon + '</text></svg>', badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">' + icon + '</text></svg>' });
+  }
+}
+
+function checkCheckInReminder() {
+  const today = new Date().toISOString().split('T')[0];
+  if (!data.checkedIn && data.lastCheckInDate !== today) {
+    const hour = new Date().getHours();
+    if (hour >= 18 && hour <= 22) {
+      showNotification('⏰ 打卡提醒', '今天还没打卡哦！坚持打卡可获得大量经验奖励~');
+    }
+  }
+}
+
+requestNotificationPermission();
+setInterval(checkCheckInReminder, 60000);
+checkCheckInReminder();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/studyflow/service-worker.js')
+      .then(registration => {
+        console.log('Service Worker registered: ', registration.scope);
+      })
+      .catch(err => {
+        console.log('Service Worker registration failed: ', err);
+      });
+  });
+}
+
 renderHome();
 </script>
 </body>
